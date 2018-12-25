@@ -1,0 +1,133 @@
+<div class="orchid-page container-fluid">
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-warning text-center">
+                                <i class="ti-folder"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>Instances</p>
+                                {{allWidgetData?.numberOfInstances}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-success text-center">
+                                <i class="ti-plug"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>Relays</p>
+                                {{allWidgetData?.numberOfRelays}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-primary text-center">
+                                <i class="ti-signal"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>Sensors</p>
+                                {{allWidgetData?.numberOfSensors}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="icon-big icon-danger text-center">
+                                <i class="ti-na"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="numbers">
+                                <p>Error Events</p>
+                                {{allWidgetData?.numberOfErrors}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" *ngFor="let instanceName of objectKeys(allLogSummaryData)">
+            <div class="card">
+                <div class="header">
+                    <div class="clearfix">
+                        <div class="float-left pull-left">
+                            <h4 class="title">{{instanceName}}</h4>
+                        </div>
+                        <div class="float-right pull-right">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="devices-accordion">
+                        <accordion>
+                            <accordion-group *ngFor="let espName of objectKeys(allLogSummaryData[instanceName]);" class="devices-list">
+                                <div class="btn-block clearfix" accordion-heading>
+                                    <div class="pull-left float-left">{{espName}}</div>&nbsp;&nbsp;&nbsp;
+                                </div>
+                                <accordion>
+                                    <accordion-group *ngFor="let espHardware of objectKeys(allLogSummaryData[instanceName][espName]);" [isDisabled]="!isESPHardwareGroupEnabled(instanceName,espName,espHardware)" heading="{{espHardware}}">
+                                        <div class="status-card-table admin-status-card-table">
+                                            <table>
+                                                <thead>
+                                                    <th>Data</th>
+                                                    <th>Data Type</th>
+                                                    <th>Data Logged</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let espLog of allLogSummaryData[instanceName][espName][espHardware]">
+                                                        <td width="20%">
+                                                            {{espLog.data}}
+                                                        </td>
+                                                        <td width="20%">
+                                                            {{espLog.dataType}}
+                                                        </td>
+                                                        <td width="60%">
+                                                            {{espLog.loggedAt | date:'medium'}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </accordion-group>
+                                </accordion>
+                            </accordion-group>
+                        </accordion>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

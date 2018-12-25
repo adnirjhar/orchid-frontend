@@ -1,0 +1,22 @@
+{
+    "/orchid/api/": {
+        "target":  {
+            "host": "localhost",
+            "protocol": "http:",
+            "port": 8080
+        },
+        "secure": false,
+        "changeOrigin": true,
+        "logLevel": "info"
+    },
+    "/orchid/socket/": {
+        "target":  {
+            "host": "localhost",
+            "protocol": "http:",
+            "port": 8080
+        },
+        "secure": false,
+        "changeOrigin": true,
+        "logLevel": "info"
+    }
+}

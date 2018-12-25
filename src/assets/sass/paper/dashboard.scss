@@ -1,0 +1,54 @@
+.orchid-page {
+    .card {
+        .icon-big {
+            text-align: left;
+        }
+    }
+    .dashboard-controls {
+        padding-bottom: 15px;
+    }
+    .add-relay-sensor-button {
+        padding-top: 15px;
+    }
+    .devices-accordion {
+        .devices-header {
+            .panel-heading.card-header {
+                background-color: #ddecfc;//#f3f9ff
+            }
+            .devices-list {
+                .panel-heading.card-header {
+                    background-color: #f3f9ff;//#f3f9ff
+                }
+            }
+        }
+        .dashboard-status-card-table {
+
+        }
+        .status-card-table {
+            table {
+                width: 100%;
+            }
+            .status-card-item {
+                padding-bottom: 5px;
+            }
+            .status-card-item-status {
+                padding-bottom: 5px;
+                text-align: left;
+                font-weight: 700;
+                &.status-success {
+                    color: green;
+                }
+                &.status-error {
+                    color: red;
+                }
+            }
+            .switch-item {
+                text-align: right;
+            }
+        }
+        .admin-status-card-table {
+            height: 250px;
+            overflow-y: scroll;
+        }
+    }
+}

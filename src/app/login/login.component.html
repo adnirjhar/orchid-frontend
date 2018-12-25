@@ -1,0 +1,18 @@
+<div class="col-sm-offset-4 col-md-offset-4 col-lg-offset-4 col-sm-4 col-md-4 col-lg-4 orchid-login-page">
+    <form>
+        <div class="form-group">
+            <label for="emailInput">Email</label>
+            <input id="emailInput" type="email" name="emailInput" [(ngModel)]="userEmail" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="passInput">Password</label>
+            <input id="passInput" type="password" name="passInput" [(ngModel)]="userPassword" class="form-control">
+            <label for="passInput" class="login-error" *ngIf="!!errorMsg">
+                <i class="ti-alert"></i>
+                {{errorMsg}}
+            </label>
+        </div>
+        <button class="btn btn-primary" type="submit" [disabled]="!checkLoginForm()" (click)="authenticate()">Login</button>
+    </form>
+
+</div>

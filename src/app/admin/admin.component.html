@@ -1,0 +1,246 @@
+<div class="orchid-page container-fluid">
+    <div class="row dashboard-controls">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <button class="btn btn-primary btn-lg" [disabled]="!isUserLoggedIn()" (click)="showModalForNewInstance()">
+                Create Instance
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" *ngFor="let instance of allInstanceData; let insIndex = index;">
+            <div class="card">
+                <div class="header">
+                    <div class="clearfix">
+                        <div class="float-left pull-left">
+                            <h4 class="title">{{instance.title}}</h4>
+                        </div>
+                        <div class="float-right pull-right">
+                            <button class="btn btn-primary btn-sm" [disabled]="!isUserLoggedIn()" (click)="deleteInstance(instance,insIndex)">Delete Instance</button>
+                            <button class="btn btn-primary btn-sm" [disabled]="!isUserLoggedIn()" (click)="editInstance(instance,insIndex)">Edit Instance</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="devices-accordion">
+                        <accordion>
+                            <accordion-group *ngFor="let device of instance.devices;let deviceIndex = index;" class="devices-list">
+                                <div class="btn-block clearfix" accordion-heading>
+                                    <div class="pull-left float-left">{{device.title}}</div>&nbsp;&nbsp;&nbsp;
+                                    <span class="badge badge-secondary">{{device?.relays?.length}} Relays</span>&nbsp;&nbsp;&nbsp;
+                                    <span class="badge badge-secondary">{{device?.sensors?.length}} Sensors</span>
+                                    <button class="badge badge-secondary float-right pull-right" [disabled]="!isUserLoggedIn()" (click)="deleteDevice(instance.devices,device,deviceIndex)">Delete Device</button>
+                                </div>
+                                <accordion>
+                                    <accordion-group heading="Relay" [isDisabled]="device?.relays?.length < 1">
+                                        <div class="status-card-table">
+                                            <table>
+                                                <tbody>
+                                                <tr *ngFor="let relay of device?.relays">
+                                                    <td width="60%">
+                                                        <div class="status-card-item-status" [ngClass]="{'status-success': !!relay.lastValue,'status-error': !relay.lastValue}">
+                                                            {{relay.title}}&nbsp;-&nbsp;{{relay.hardwareId}}
+                                                        </div>
+                                                    </td>
+                                                    <td width="30%">
+                                                        <div class="switch-item">
+                                                            <ui-switch [size]="'small'"
+                                                                       [(ngModel)]="relay.lastValue"
+                                                                       (ngModelChange)="turnOffRelayOffice(relay)"
+                                                                       [disabled]="!isUserLoggedIn()"
+                                                            ></ui-switch>
+                                                        </div>
+                                                    </td>
+                                                    <td width="10%">
+                                                        <button class="badge badge-secondary float-right pull-right" [disabled]="!isUserLoggedIn()" (click)="deleteESPHardware(device.sensors,sensor,espIndex)">Delete Relay</button>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </accordion-group>
+                                    <accordion-group heading="Sensors" [isDisabled]="device?.sensors?.length < 1">
+                                        <div class="status-card-table">
+                                            <table>
+                                                <tbody>
+                                                <tr *ngFor="let sensor of device.sensors;let espIndex = index;">
+                                                    <td width="60%">
+                                                        <div class="status-card-item-status" [ngClass]="{'status-success': !!sensor.lastValue,'status-error': !sensor.lastValue}">
+                                                            {{sensor.title}}&nbsp;-&nbsp;{{sensor.hardwareId}}
+                                                        </div>
+                                                    </td>
+                                                    <td width="30%">
+                                                        <div class="switch-item">
+                                                            <ui-switch [size]="'small'"
+                                                                       [(ngModel)]="sensor.lastValue"
+                                                                       (ngModelChange)="turnOffRelayOffice(sensor)"
+                                                                       [disabled]="!isUserLoggedIn()"
+                                                            ></ui-switch>
+                                                        </div>
+                                                    </td>
+                                                    <td width="10%">
+                                                        <button class="badge badge-secondary float-right pull-right" (click)="deleteESPHardware(device.sensors,sensor,espIndex)">Delete Sensor</button>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </accordion-group>
+                                </accordion>
+                                <button class="btn btn-primary" [disabled]="!isUserLoggedIn()" (click)="showAddNewHardwareModal(device)">
+                                    Add Relay
+                                </button>
+                            </accordion-group>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12 add-relay-sensor-button">
+                                    <button class="btn btn-primary" [disabled]="!isUserLoggedIn()" (click)="showAddNewDeviceModal(instance)">Add New Device</button>
+                                </div>
+                            </div>
+                        </accordion>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" bsModal #instanceModal="bs-modal" [config]="{backdrop: false}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="clearfix">
+                    <div class="float-left pull-left">
+                        <b>{{createNewInstanceData.id ? 'Update ' : 'Create '}} Instance</b>
+                    </div>
+                    <div class="float-right pull-right">
+                        <div (click)="instanceNgModalDir.hide()"><i class="ti-close"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form #instanceForm="ngForm" novalidate>
+                    <div class="form-group">
+                        <label for="instanceTitle">Instance Title (Example : Home)</label>
+                        <input id="instanceTitle" type="text" name="instanceTitle" [(ngModel)]="createNewInstanceData.title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="instanceName">InstanceId (Example : home)</label>
+                        <input id="instanceName" type="text" name="instanceName" [(ngModel)]="createNewInstanceData.name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dlgFlowRef">DialogFlow Ref (Example : home)</label>
+                        <input id="dlgFlowRef" type="text" name="dlgFlowRef" [(ngModel)]="createNewInstanceData.dialogFlowRef" class="form-control" required>
+                    </div>
+                    <button class="btn btn-primary" type="submit" [disabled]="!instanceNgForm.valid" (click)="updateInstance()">{{createNewInstanceData.id ? 'Update' : 'Create'}}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" bsModal #deviceModal="bs-modal" [config]="{backdrop: false}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="clearfix">
+                    <div class="float-left pull-left">
+                        <b>Create Device</b>
+                    </div>
+                    <div class="float-right pull-right">
+                        <div (click)="deviceModalDir.hide()"><i class="ti-close"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form #deviceForm="ngForm" novalidate>
+                    <div class="form-group">
+                        <label for="title">Device Title (Example : Living Room)</label>
+                        <input id="title" type="text" name="title" [(ngModel)]="createNewDeviceData.title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceId">Device ID (Example : livingRoomESP)</label>
+                        <input id="deviceId" type="text" name="deviceId" [(ngModel)]="createNewDeviceData.deviceId" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dialogFlowRef">DialogFlow Ref (Example : livingRoom)</label>
+                        <input id="dialogFlowRef" type="text" name="dialogFlowRef" [(ngModel)]="createNewDeviceData.dialogFlowRef" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enabled">Enabled</label>
+                        <input id="enabled" type="checkbox" name="enabled" [(ngModel)]="createNewDeviceData.enabled">
+                    </div>
+                    <button class="btn btn-primary" type="submit" [disabled]="!deviceNgForm.valid" (click)="addNewDevice()">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" bsModal #hardwareModal="bs-modal" [config]="{backdrop: false}" tabindex="-1" role="dialog" aria-labelledby="dialog-static-name">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="clearfix">
+                    <div class="float-left pull-left">
+                        <b>Create Hardware</b>
+                    </div>
+                    <div class="float-right pull-right">
+                        <div (click)="hardwareModalDir.hide()"><i class="ti-close"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form #hardwareForm="ngForm" novalidate>
+                    <div class="form-group">
+                        <label for="hardwareTitle">Hardware Title (Example : Fan 1)</label>
+                        <input id="hardwareTitle" type="text" name="hardwareTitle" [(ngModel)]="createNewHardwareData.title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hrddialogFlowRef">DialogFlow Ref (Example : fan1)</label>
+                        <input id="hrddialogFlowRef" type="text" name="hrddialogFlowRef" [(ngModel)]="createNewHardwareData.dialogFlowRef" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" name="type" class="form-control" [(ngModel)]="createNewHardwareData.type" (ngModelChange)="onHardwareIdParamsChange()" required>
+                            <option>Relay</option>
+                            <option>Sensor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hardware Pin</label>
+                        <select *ngIf="createNewHardwareData.type === 'Relay'" name="hardwareId" class="form-control" [(ngModel)]="hardwareIdPin" (ngModelChange)="onHardwareIdParamsChange()" required>
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                        </select>
+                        <select *ngIf="createNewHardwareData.type === 'Sensor'" name="hardwareId" class="form-control" [(ngModel)]="hardwareIdPin" (ngModelChange)="onHardwareIdParamsChange()" required>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <b>Hardware ID : {{createNewHardwareData.hardwareId}}</b>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastvalue">Value</label>
+                        <input id="lastvalue" type="number" name="lastvalue" [(ngModel)]="createNewHardwareData.lastValue" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newhard-enabled">Enabled</label>
+                        <input id="newhard-enabled" type="checkbox" name="newhard-enabled" [(ngModel)]="createNewHardwareData.enabled">
+                    </div>
+                    <button class="btn btn-primary" type="submit" [disabled]="!hardwareNgForm.valid" (click)="addNewESPHardware()">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
